@@ -27,7 +27,7 @@
 		</triggeringPolicy>
 	</appender>
 
-	<logger name="com.COM.port" level="debug" additivity="false">
+	<logger name="com.COM" level="debug" additivity="false">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE-ENGINE" />
 	</logger>
