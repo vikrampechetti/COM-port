@@ -21,23 +21,31 @@ public class ExtractDataFromXML {
 	static Logger logger = LoggerFactory.getLogger(ExtractDataFromXML.class);
 
 	public static void main(String[] args) {
-		JSONObject jsonObject=null;
+		
 		try {
-			jsonObject = new JSONObject(XMLtoJSON(readFile("C:/Users/oohith/Desktop/CCTV.xml"), 4));
-		} catch (JSONException | IOException e) {
+			ExtractCOMPortdata("");
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		run(jsonObject);
 	}
 
 	/**
 	 * @param jsonObject 
 	 *
 	 */
-	private static void run(JSONObject jsonObject) {
+	private static void ExtractCOMPortdata(String COMPortData) throws IOException {
 		try {
-
+			JSONObject jsonObject=null;
+			try {
+				//jsonObject = new JSONObject(XMLtoJSON(readFile("C:/Users/oohith/Desktop/CCTV.xml"), 4));
+				jsonObject=new JSONObject(XMLtoJSON(COMPortData, 4));
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			JSONObject payload = new JSONObject();
 			JSONObject MetadataHeader = jsonObject.getJSONObject("AnalyticsAlert").getJSONObject("MetadataHeader");
 			payload.put("MetaID", MetadataHeader.getJSONObject("MetaID").get("content"));

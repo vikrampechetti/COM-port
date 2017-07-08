@@ -53,4 +53,27 @@ public interface COMConfig extends Config {
 	String CCTVDB2Table();
 
 	String CCTVRequiredFields();
+	/*****************************************
+	 * CCTVCopy configurations
+	 ****************************************/
+	String CCTVCopyDataSourceID();
+
+	String CCTVCopyDataSourceName();
+
+	String CCTVCopyDB2Table();
+
+	String CCTVCopyRequiredFields();
+	/**
+	 *
+	 */
+	String tempfilesLocations();
+
+	/*****************************************
+	 * SQL Server Credentials
+	 *****************************************/
+	String SQLUsername();
+
+	String SQLUserSecret();
+
+	String SQLConnectionURL();
 }

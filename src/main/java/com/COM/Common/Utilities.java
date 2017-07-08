@@ -1,5 +1,10 @@
 package com.COM.Common;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.aeonbits.owner.ConfigFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,37 +77,53 @@ public class Utilities {
 		return curDateTime;
 	}
 
+
 	/**
-	 * To Execute Select Query
+	 * To Remove unwanted Keys in a JSONobject
 	 */
-	public static PreparedStatement ExecuteSelectQuery(String SelectQuery) {
-		Connection connection = Utilities.GetDB2Connection();
-		PreparedStatement preparedStatement = null;
+	public static JSONObject filterJsonObject(JSONObject jsonObject, String requiredFields) {
+		JSONObject finalJsonString = new JSONObject();
+		for (String key : requiredFields.split(",")) {
+			try {
+				finalJsonString.put(key, jsonObject.get(key));
+			} catch (JSONException e) {
+				logger.error("Exception @ filterJsonObject }" + e);
+			}
+		}
+		return finalJsonString;
+	}
+
+	/**
+	 * To Write Text
+	 */
+	public static void WriteProcessedIDTotemp(String ID, String DataSourceName) {
+
+		BufferedWriter bw = null;
+		FileWriter fw = null;
 		try {
-			preparedStatement = connection.prepareStatement(SelectQuery);
-		} catch (SQLException e) {
-			logger.error("Exception @ ExecuteSelectQuery }" + e.toString());
+			String IDofLastProcessed = new String(Files.readAllBytes(Paths.get(config.tempfilesLocations() + DataSourceName + ".txt")));
+			try {
+				if ((Integer.parseInt(IDofLastProcessed) < Integer.parseInt(ID))) {
+					fw = new FileWriter(config.tempfilesLocations() + DataSourceName + ".txt");
+					bw = new BufferedWriter(fw);
+					bw.write(ID.toString());
+				}
+			} catch (Exception e) {
+				fw = new FileWriter(config.tempfilesLocations() + DataSourceName + ".txt");
+				bw = new BufferedWriter(fw);
+				bw.write("0");
+			}
+		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (bw != null)
+					bw.close();
+				if (fw != null)
+					fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
-		return preparedStatement;
 	}
-
-	/**
-	 * To get DataBase Connection
-	 */
-	public static Connection GetDB2Connection() {
-		Connection con=null;
-		try {
-			
-			Class.forName("com.ibm.db2.jcc.DB2Driver");
-			con = DriverManager.getConnection(config.DB2ConnectionURL(), config.DB2Username(), config.DB2Usersecret());
-			con.setAutoCommit(false);
-			
-		} catch (ClassNotFoundException | SQLException e) {
-			logger.error("Exception @ GetDataBaseConnection }" + e.toString());
-
-		}
-		return con;
-	}
-
 }
