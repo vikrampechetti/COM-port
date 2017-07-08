@@ -7,6 +7,9 @@ import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.COM.port.config.COMConfig;
+import com.COM.port.connect.read.data.ReadDatafromCOMPort;
+
 public class ConnectCOMPort implements Runnable, SerialPortEventListener {
 	
 	static COMConfig config = ConfigFactory.create(COMConfig.class);
@@ -25,7 +28,7 @@ public class ConnectCOMPort implements Runnable, SerialPortEventListener {
         while (portList.hasMoreElements()) {
             portId = (CommPortIdentifier) portList.nextElement();
             if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-                 if (portId.getName().equals("COM1")) {
+                 if (portId.getName().equals(config.comPortName())) {
 			//                if (portId.getName().equals("/dev/term/a")) {
                     ConnectCOMPort reader = new ConnectCOMPort();
                 }
@@ -35,7 +38,7 @@ public class ConnectCOMPort implements Runnable, SerialPortEventListener {
 
     public ConnectCOMPort() {
         try {
-            serialPort = (SerialPort) portId.open("SimpleReadApp", 2000);
+            serialPort = (SerialPort) portId.open(config.comSerialPortName(), 2000);
         } catch (PortInUseException e) {
         	System.out.println(e);
         }
@@ -43,11 +46,13 @@ public class ConnectCOMPort implements Runnable, SerialPortEventListener {
             inputStream = serialPort.getInputStream();
         } catch (IOException e) {
         	System.out.println(e);
+        	logger.error("{	Xcdeption@inputStream	}	"+e);
         }
         try {
             serialPort.addEventListener(this);
         } catch (TooManyListenersException e) {
         	System.out.println(e);
+        	logger.error("{	Xcdeption@inputStream	}	"+e);
         }
         serialPort.notifyOnDataAvailable(true);
         try {
@@ -55,7 +60,9 @@ public class ConnectCOMPort implements Runnable, SerialPortEventListener {
                 SerialPort.DATABITS_8,
                 SerialPort.STOPBITS_1,
                 SerialPort.PARITY_NONE);
-        } catch (UnsupportedCommOperationException e) {System.out.println(e);}
+        } catch (UnsupportedCommOperationException e) {
+        	logger.error("{	Xception@ConnectCOMPort	}	"+e);
+        }
         readThread = new Thread(this);
         readThread.start();
     }
@@ -85,7 +92,12 @@ public class ConnectCOMPort implements Runnable, SerialPortEventListener {
                 while (inputStream.available() > 0) {
                     int numBytes = inputStream.read(readBuffer);
                 }
-                System.out.print(new String(readBuffer));
+                
+                String data = new String(readBuffer);
+                System.out.print("Data from COM port "+data);
+                
+                ReadDatafromCOMPort readDatafromCOMPort = new ReadDatafromCOMPort();
+                readDatafromCOMPort.readData(data);
             } catch (IOException e) {
             	System.out.println(e);
             }

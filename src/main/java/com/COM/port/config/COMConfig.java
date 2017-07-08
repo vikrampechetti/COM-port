@@ -7,5 +7,9 @@ import org.aeonbits.owner.Config.Sources;
 "file:C:\\COM\\config\\COMConfig.properties"})
 
 public interface COMConfig extends Config {
-
+	String comPortName();
+	
+	String comSerialPortName();
+	
+	int comSerialPort();
 }
