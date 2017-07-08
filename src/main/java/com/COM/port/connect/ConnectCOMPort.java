@@ -2,7 +2,9 @@ package com.COM.port.connect;
 
 import java.io.*;
 import java.util.*;
+
 import javax.comm.*;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
